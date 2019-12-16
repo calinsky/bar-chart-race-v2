@@ -1,0 +1,14 @@
+{
+  "name": "f55121d560fe4f44",
+  "main": "f55121d560fe4f44@3007.js",
+  "version": "3007.0.0",
+  "homepage": "https://observablehq.com/d/f55121d560fe4f44",
+  "author": {
+    "name": "Brad Smith",
+    "url": "https://observablehq.com/@smithwebtek"
+  },
+  "type": "module",
+  "peerDependencies": {
+    "@observablehq/runtime": "4"
+  }
+}
