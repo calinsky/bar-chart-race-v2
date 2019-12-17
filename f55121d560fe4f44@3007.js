@@ -1,7 +1,12 @@
 // https://observablehq.com/d/f55121d560fe4f44@3007
+
+const csvfile = [{ file: 'naics_establishments.csv', description: 'Establishments count, per year.' }]
+// const csvfile = { file: 'naics_sectors.csv', description: 'Sectors count, per year.' }
+// const csvfile = 'original_stock_companies.csv'
+
 export default function define(runtime, observer) {
   const main = runtime.module();
-  const fileAttachments = new Map([["naics_establishments.csv",new URL("./files/naics_establishments.csv",import.meta.url)]]);
+  const fileAttachments = new Map([[csvfile.file,new URL(`./files/${csvfile.file}`,import.meta.url)]]);
   main.builtin("FileAttachment", runtime.fileAttachments(name => fileAttachments.get(name)));
   main.variable(observer()).define(["md"], function(md){return(
 md`# Bar Chart Race, Explained
@@ -9,7 +14,7 @@ md`# Bar Chart Race, Explained
 This is a pedagogical implementation of an animated [bar chart race](/@d3/bar-chart-race). Read on to learn how it works, or fork this notebook and drop in your data!`
 )});
   main.variable(observer("data")).define("data", ["d3","FileAttachment"], async function(d3,FileAttachment){return(
-d3.csvParse(await FileAttachment("naics_establishments.csv").text(), d3.autoType)
+d3.csvParse(await FileAttachment(csvfile.file).text(), d3.autoType)
 )});
   main.variable(observer()).define(["md"], function(md){return(
 md`The data for the race is a CSV with columns *date* (in [YYYY-MM-DD format](https://www.ecma-international.org/ecma-262/9.0/index.html#sec-date-time-string-format)), *name*, *value* and optionally *category* (which if present determines color). To replace the data, click the file icon <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke-width="2"><path d="M12.1637 11.8446L12.7364 11.286L12.1637 11.8446ZM5.97903 6.6495L11.591 12.4032L12.7364 11.286L7.12442 5.53232L5.97903 6.6495ZM10.6159 13.3544L4.37343 6.95428L3.22804 8.07146L9.47048 14.4715L10.6159 13.3544ZM7.44625 4.02933L13.4139 10.4536L14.5861 9.36462L8.61851 2.94039L7.44625 4.02933ZM4.23394 4.1499C5.0428 3.13633 6.5637 3.07925 7.44625 4.02933L8.61851 2.94039C7.0703 1.27372 4.40228 1.37385 2.98335 3.15189L4.23394 4.1499ZM4.37343 6.95428C3.62641 6.1884 3.56661 4.98612 4.23394 4.1499L2.98335 3.15189C1.81269 4.61883 1.91759 6.72792 3.22804 8.07146L4.37343 6.95428ZM11.591 13.3544C11.3237 13.6284 10.8832 13.6284 10.6159 13.3544L9.47048 14.4715C10.3657 15.3893 11.8412 15.3893 12.7364 14.4715L11.591 13.3544ZM11.591 12.4032C11.8491 12.6678 11.8491 13.0898 11.591 13.3544L12.7364 14.4715C13.6006 13.5855 13.6006 12.172 12.7364 11.286L11.591 12.4032Z" fill="currentColor"></path></svg> in the cell above.`
@@ -19,9 +24,7 @@ html`<button>Replay`
 )});
   main.variable(observer("replay")).define("replay", ["Generators", "viewof replay"], (G, _) => G.input(_));
   main.variable(observer("title")).define("title", ["md"], function(md){return(
-md`## Best Global Brands
-
-Value in $M; color indicates sector. Data: [Interbrand](https://www.interbrand.com/best-brands/)`
+md`## ${csvfile.description} in MAPC Region.`
 )});
   main.variable(observer("chart")).define("chart", ["replay","d3","width","height","bars","axis","labels","ticker","keyframes","duration","x","invalidation"], async function*(replay,d3,width,height,bars,axis,labels,ticker,keyframes,duration,x,invalidation)
 {
@@ -232,7 +235,7 @@ function labels(svg) {
   let label = svg.append("g")
       .style("font", "bold 12px var(--sans-serif)")
       .style("font-variant-numeric", "tabular-nums")
-      .attr("text-anchor", "end")
+      .attr("text-anchor", "initial")
     .selectAll("text");
 
   return ([date, data], transition) => label = label
